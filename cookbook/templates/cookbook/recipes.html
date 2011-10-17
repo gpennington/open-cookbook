@@ -1,0 +1,63 @@
+{% extends "cookbook/base.html" %}
+{% block nav %}
+		<div  id="nav">
+			<ul>
+				<li class="first"><a href="{% url cookbook.views.homepage %}">Home</a></li>
+				<li {% if recipes_only %}id="current"{% endif %}><a href="{% url cookbook.views.recipes %}">Recipes</a></li>
+				<li {% if top_rated %}id="current"{% endif %}><a href="{% url cookbook.views.top_rated %}">Top Recipes</a></li>
+			</ul>
+                    <div class="search">
+                        <form method="get" action="{% url cookbook.views.search %}">
+                        <input type="search" name="search" />
+                        <input type="submit" value="Go"/>
+                        </form>
+                    </div>
+		</div>
+                {% endblock %}
+
+{% block content %}
+<div id="left">
+{% if tag_slug %}<p>Your search for recipes tagged with {{ tag_slug }}{% endif %}
+{% if search_query %}
+    <p>Your search for {{ search_query }} {% if not recipes.object_list %} had no results :( {% endif %}</p>
+    {% endif %}
+    
+    {% for recipe in recipes.object_list %}
+    <div class="entry {% if forloop.counter == 4 %}clear {% endif %}">
+            
+            <h3><a href="{{ recipe.get_absolute_url }}">{{ recipe.title|truncatewords:2 }}</a></h3>
+            <a href="{{ recipe.get_absolute_url }}">
+            {% if recipe.image_upload %}
+            {% load thumbnail %}
+            {% thumbnail recipe.image_upload "250x150" crop="center" as im %}
+            <img src="{{ im.url }}" width="250" height="150"/>
+            {% endthumbnail %}
+            {% else %}
+            <img src="{{ recipe.image }}" width="250" height="150"/>
+            {% endif %}
+            </a>
+            {% autoescape off %}
+            {{ recipe.directions|truncatewords_html:10 }}
+            {% endautoescape %}
+            
+    </div>
+    {% endfor %}
+    <div class="pagination">
+    <span class="step-links">
+        {% if recipes.has_previous %}
+            <a href="?page={{ recipes.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ recipes.number }} of {{ recipes.paginator.num_pages }}.
+        </span>
+
+        {% if recipes.has_next %}
+            <a href="?page={{ recipes.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">next</a>
+        {% endif %}
+    </span>
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "cookbook/base.html" %}
+{% load comments %}
+                {% block nav %}
+		<div  id="nav">
+			<ul>
+				<li class="first"><a href="{% url cookbook.views.homepage %}">Home</a></li>
+				<li id="current"><a href="{% url cookbook.views.recipes %}">Recipes</a></li>
+				<li><a href="{% url cookbook.views.top_rated %}">Top Recipes</a></li>
+			</ul>
+                    <div class="search">
+                        <form method="get" action="{% url cookbook.views.search %}">
+                        <input type="search" name="search" />
+                        <input type="submit" value="Go"/>
+                        </form>
+                    </div>
+		</div>
+                {% endblock %}
+{% block content %}
+
+<!-- Begin new -->
+
+
+        <div id="left" class="recipe">
+
+                <div class="post no-bg">
+
+                        <h2>{{ recipe.title }}</h2>
+                        
+                        <div class="image-section">
+                            {% if recipe.image_upload %}
+                            {% load thumbnail %}
+                            {% thumbnail recipe.image_upload "510x250" crop="center" as im %}
+                            <img src="{{ im.url }}" width="510" height="250"/>
+                            {% endthumbnail %}
+                            {% else %}
+                            <img src="{{ recipe.image }}" width="510" height="250"/>
+                            {% endif %}
+
+                            
+                        </div>
+
+                        {% autoescape off %}
+                        <h3>Directions</h3>
+                        {{ recipe.directions }}
+                        
+                        
+                        {% endautoescape %}
+                        {% if recipe.source %}
+                        <h4>Source</h4>
+                        <p>{{ recipe.source }}</p>
+                        {% endif %}
+                        <p class="tags">
+                                <strong>Tagged : </strong>
+                                {% for tag in recipe.get_tags %}
+                                <a href="/tag/{{ tag }}">{{ tag }}</a>{% if not forloop.last %},{% else %}{% endif %}
+                                {% endfor %}
+                                <strong>Rated : </strong>
+                                {{ recipe.rating }} stars
+                        </p>
+                        
+                        {% get_comment_count for recipe as comment_count %}
+                        <h3 id="comments">{{ comment_count }} Responses</h3>
+                        {% get_comment_list for recipe as comment_list %}
+                        {% load travel_tags %}
+			
+                        <ol class="commentlist">
+                                {% for comment in comment_list %}
+                                <li class="alt" id="comment-63">
+                                        <cite>
+                                                {% show_gravatar comment.user_email 40 %}
+                                                <a href="index.html">{{ comment.user_name }}</a> Says: <br />
+                                                <span class="comment-data"><a href="#comment-63" title="">{{ comment.submit_date }}</a> </span>
+                                        </cite>
+
+                                        <div class="comment-text">
+                                                <p>{{ comment.comment }}</p>
+                                        </div>
+                                </li>
+                                {% endfor %}
+                        </ol>
+
+                        <h3 id="respond">Leave a Reply</h3>
+                        
+                        {% get_comment_form for recipe as form %}
+                        <form action="{% comment_form_target %}" method="post" id="comments">{% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="submit" name="post" class="submit-post button" value="Post">
+                        <input type="hidden" name="next" value="/recipe/{{ recipe.slug }}" />
+                        </form>
+
+                        <!--
+                        <form action="index.html" method="post" id="commentform">
+
+                                <p>
+                                        <label for="name">Name (required)</label><br />
+                                        <input id="name" name="name" value="Your Name" type="text" tabindex="1" />
+                                </p>
+
+                                <p>
+                                        <label for="email">Email Address (required)</label><br />
+                                        <input id="email" name="email" value="Your Email" type="text" tabindex="2" />
+                                </p>
+
+                                <p>
+                                        <label for="website">Website</label><br />
+                                        <input id="website" name="website" value="Your Website" type="text" tabindex="3" />
+                                </p>
+
+                                <p>
+                                        <label for="message">Your Message</label><br />
+                                        <textarea id="message" name="message" rows="10" cols="20" tabindex="4"></textarea>
+                                </p>
+
+                                <p class="no-border">
+                                        <input class="button" type="submit" value="Submit" tabindex="5" />
+                                </p>
+
+                        </form>
+                        -->
+                </div>
+
+        </div>
+
+<div class="recipeInfo">
+    {% autoescape off %}
+    {% if recipe.ingredients %}
+    <h3>Ingredients</h3>
+    {{ recipe.ingredients }}
+    {% endif %}
+    {% if recipe.tips %}
+    <h3>Tips</h3>
+    {{ recipe.tips }}
+    {% endif %}
+    {% if recipe.healthier_substitutions %}
+    <h3>Healthy Substitutions</h3>
+    {{ recipe.healthier_substitutions }}
+    {% endif %}
+    {% endautoescape %}
+
+</div>
+        
+			
+			
+			<!-- End new -->
+
+{% endblock %}

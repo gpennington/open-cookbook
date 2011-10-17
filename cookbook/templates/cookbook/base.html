@@ -1,0 +1,202 @@
+<!-- BEgin New -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>The Open Cook Book</title>
+<meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="description" content="Site Description Here" />
+<meta name="keywords" content="keywords, here" />
+<meta name="robots" content="index, follow, noarchive" />
+<meta name="googlebot" content="noarchive" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}cookbook/css/screen.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}cookbook/javascript/jquery.cycle.all.min.js"/>
+<script>
+    var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-4439935-4']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+{% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<!-- wrap starts here -->
+<div id="wrap">
+
+	<!--header -->
+	<div id="header">
+
+		<h1 id="logo-text"><a href="{% url cookbook.views.homepage %}" title="Open Cook Book">Open cook book</a></h1>
+		<p id="slogan">From our house to yours</p>
+                {% block nav %}
+		<div  id="nav">
+			<ul>
+				<li class="first" id="current"><a href="{% url cookbook.views.homepage %}">Home</a></li>
+				<li><a href="{% url cookbook.views.recipes %}">Recipes</a></li>
+				<li><a href="{% url cookbook.views.top_rated %}">Top Recipes</a></li>
+			</ul>
+                    <div class="search">
+                        <form method="get" action="{% url cookbook.views.search %}">
+                        <input type="search" name="search" />
+                        <input type="submit" value="Go"/>
+                        </form>
+                    </div>
+		</div>
+                {% endblock %}
+
+		<div id="header-image"></div>
+
+	<!--header ends-->
+	</div>
+        {% if featured_recipes %}
+	<!-- featured starts -->
+        <div id="featuredStuff">
+            {% for recipe in featured_recipes %}
+	<div class="clear featured">
+            <div class="image-block">
+                {% if recipe.image_upload %}
+                {% load thumbnail %}
+                {% thumbnail recipe.image_upload "350x250" crop="center" as im %}
+                <img src="{{ im.url }}" width="350" height="250"/>
+                {% endthumbnail %}
+                {% else %}
+                <img src="{{ recipe.image }}" width="350" height="250"/>
+                {% endif %}
+            
+            
+            </div>
+            <div class="text-block">
+                <h2><a href="{{ recipe.get_absolute_url }}">{{ recipe.title }}</a></h2>
+                <p class="post-info">Tagged as
+                    {% for tag in recipe.get_tags %}
+                    <a href="/tag/{{ tag }}">{{ tag }}</a>, 
+                    {% endfor %}
+                </p>
+                {% autoescape off %}
+                {{ recipe.directions|truncatewords_html:40 }}
+                {% endautoescape %}
+                <p><a href="{{ recipe.get_absolute_url }}" class="more-link">Read More</a></p>
+
+            </div>
+	</div>
+           
+
+            {% endfor %}
+        </div>
+        {% endif %}
+	<!-- content -->
+	<div id="content-outer" class="clear"><div id="content-wrap">
+
+		<div id="content">
+                    {% block content %}{% endblock %}
+			<!--<div id="right">
+
+                            <h3>Search</h3>
+
+				<form id="quick-search" action="/search" method="get" >
+					<p>
+					<label for="qsearch">Search:</label>
+					<input class="tbox" id="search" type="text" name="search" value="type and hit enter..." title="Start typing and hit ENTER" />
+					<input class="btn" alt="Search" type="image" name="searchsubmit" title="Search" src="{{ STATIC_URL }}cookbook/images/search.gif" />
+					</p>
+				</form>
+
+				<div class="sidemenu">
+					
+				</div>
+
+			</div>-->
+
+		</div>
+
+	<!-- content end -->
+	</div></div>
+
+	<!-- footer starts here -->
+	<div id="footer-outer" class="clear"><div id="footer-wrap">
+
+		<div class="col-a">
+
+			<h3>Recent Recipes</h3>
+
+			<p class="thumbs">
+                            {% if photo_recipes %}
+                                {% for recipe in photo_recipes %}
+                                    {% if recipe.image_upload %}
+                                        {% load thumbnail %}
+                                        {% thumbnail recipe.image_upload "40x40" crop="center" as im %}
+                                        <a href="{{ recipe.get_absolute_url }}" title="{{ recipe.title }}"><img src="{{ im.url }}" width="40" height="40"/></a>
+                                        {% endthumbnail %}
+                                    {% else %}
+                                    <a href="{{ recipe.get_absolute_url }}"><img src="{{ recipe.image }}" width="40" height="40"/></a>
+
+                                    {% endif %}
+                                {% endfor %}
+
+                            {% endif %}
+				
+			</p>
+
+			
+
+		</div>
+
+		<div class="col-a">
+
+			<h3>About Our Family</h3>
+
+                        <p>We live in a small city in the midwest and enjoy cooking, traveling, and
+                        nice weather.  We share our home with our wonderful corgi Bristol.</p>
+
+		
+
+		</div>
+
+		<div class="col-b">
+
+			<h3>About</h3>
+
+			<p>
+                            {% load travel_tags %}
+			<a href="index.html">{% show_gravatar "dstegelman@gmail.com" 40 %}</a>
+			Open Cook Book is a creative outlet for the Stegelman family's cooking adventures.
+                        All of the above recipes have been made by us at least once and are probably modified
+                        from their original versions.</p>
+
+			
+
+		</div>
+
+	<!-- footer ends -->
+	</div></div>
+
+	<!-- footer-bottom starts -->
+	<div id="footer-bottom">
+		<div class="bottom-left">
+			<p>
+			&copy; 2011 <strong>Derek and Lindy Stegelman</strong>&nbsp; &nbsp; &nbsp;
+			<a href="http://www.bluewebtemplates.com/" title="Website Templates">website templates</a> by <a href="http://www.styleshout.com/">styleshout</a>
+			</p>
+		</div>
+
+		
+	<!-- footer-bottom ends -->
+	</div>
+
+<!-- wrap ends here -->
+</div>
+
+</body>
+</html>
+
+
+<!-- ENd New -->
+

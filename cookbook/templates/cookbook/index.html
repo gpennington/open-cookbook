@@ -1,0 +1,47 @@
+{% extends "cookbook/base.html" %}
+{% block extra_head %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#featuredStuff').cycle({
+	fx: 'fade' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+	});
+});
+</script>
+{% endblock %}
+{% block content %}
+<div id="left">
+<div id="home">
+    
+    <div class="tagLines">
+        <h2>From our house to yours...</h2>
+        <p>We love to cook, so when we make a new recipe we like to put it on here to share
+        with family and friends.  Take a look around and let us know what you think!</p>
+    </div>
+
+</div>
+    {% for recipe in recipes %}
+    <div class="entry {% if forloop.counter == 4 %}clear {% endif %}">
+            
+            <h3><a href="{{ recipe.get_absolute_url }}" title="{{ recipe.title }}">{{ recipe.title|truncatewords:2 }}</a></h3>
+            <a href="{{ recipe.get_absolute_url }}" title="{{ recipe.title }}">
+            {% if recipe.image_upload %}
+            {% load thumbnail %}
+            {% thumbnail recipe.image_upload "250x150" crop="center" as im %}
+            <img src="{{ im.url }}" width="250" height="150">
+            {% endthumbnail %}
+            {% else %}
+            <img src="{{ recipe.image }}" width="250" height="150">
+           
+            {% endif %}
+             </a>
+            {% autoescape off %}
+            {{ recipe.directions|truncatewords_html:10 }}
+            {% endautoescape %}
+            <!--<p><a class="more-link" href="index.html">continue reading</a></p>-->
+    </div>
+    {% endfor %}
+
+
+</div>
+
+{% endblock %}
